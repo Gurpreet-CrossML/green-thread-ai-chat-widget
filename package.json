@@ -1,0 +1,37 @@
+{
+  "name": "renkaat-chatbot-widget",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Renkaat247 AI tyre-selection chatbot — embeddable widget",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.23.24",
+    "i18next": "^25.0.0",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "lucide-react": "^0.554.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-i18next": "^15.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "terser": "^5.31.1",
+    "typescript": "^5.8.3",
+    "vite": "^7.2.2"
+  }
+}
