@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Upload Photos — Renkaat247</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+          Helvetica, Arial, sans-serif;
+        height: 100dvh;
+        width: 100vw;
+        overflow: hidden;
+        background: #fff;
+        color: #1a1a1a;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .slide {
+        display: none;
+        flex-direction: column;
+        height: 100dvh;
+        width: 100%;
+        overflow: hidden;
+      }
+      .slide.active {
+        display: flex;
+      }
+
+      /* ─── Header ─── */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 20px 16px 8px;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .header img {
+        height: 28px;
+      }
+      .header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 6px;
+        color: #1a1a1a;
+      }
+      .header p {
+        font-size: 13px;
+        color: #666;
+        text-align: center;
+      }
+
+      /* ─── Slide 1: Upload ─── */
+      .upload-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px 16px;
+        overflow: hidden;
+      }
+
+      .dropzone {
+        width: 100%;
+        border: 2px dashed #c4c4c4;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        background: #fafffe;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .dropzone.drag-over {
+        border-color: #019034;
+        background: #e8f9ef;
+      }
+      .dropzone-icon {
+        width: 52px;
+        height: 52px;
+        background: #e6f5ec;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .dropzone-icon svg {
+        width: 26px;
+        height: 26px;
+        color: #019034;
+      }
+      .dropzone h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+      .dropzone p {
+        font-size: 12px;
+        color: #888;
+      }
+
+      .btn-choose {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 24px;
+        background: #019034;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 4px;
+      }
+      .btn-choose:active {
+        background: #017a2c;
+      }
+      .btn-choose svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Trust badge */
+      .trust-badge {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: #f7fdf9;
+        border: 1px solid #d4edda;
+        border-radius: 12px;
+      }
+      .trust-icon {
+        width: 32px;
+        height: 32px;
+        background: #e6f5ec;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .trust-icon svg {
+        width: 16px;
+        height: 16px;
+        color: #019034;
+      }
+      .trust-badge h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #019034;
+      }
+      .trust-badge p {
+        font-size: 11px;
+        color: #666;
+        margin-top: 1px;
+      }
+
+      /* Benefits */
+      .benefits {
+        width: 100%;
+        text-align: center;
+      }
+      .benefits h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+      }
+      .benefits-grid {
+        display: flex;
+        justify-content: space-around;
+      }
+      .benefit-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+      }
+      .benefit-icon {
+        width: 36px;
+        height: 36px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .benefit-icon svg {
+        width: 16px;
+        height: 16px;
+        color: #555;
+      }
+      .benefit-item strong {
+        font-size: 11px;
+        color: #1a1a1a;
+      }
+      .benefit-item span {
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+        line-height: 1.2;
+      }
+
+      /* Footer */
+      .footer-text {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        padding: 8px 0 4px;
+      }
+      .footer-text b {
+        color: #019034;
+      }
+
+      /* ─── Slide 2: Preview ─── */
+      .preview-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 20px 16px;
+        overflow: hidden;
+      }
+
+      .preview-top-row {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .preview-top-row span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+      .clear-all {
+        font-size: 13px;
+        color: #019034;
+        font-weight: 600;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .photo-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .photo-cell {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 1 / 0.8;
+        background: #f0f0f0;
+      }
+      .photo-cell img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .photo-remove {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.55);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+      }
+      .photo-remove svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* Dots */
+      .dots {
+        display: flex;
+        gap: 6px;
+        margin: 10px 0;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .dot.active {
+        width: 20px;
+        border-radius: 4px;
+        background: #019034;
+      }
+
+      /* Replace zone */
+      .replace-zone {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 0;
+        cursor: pointer;
+      }
+      .replace-zone .replace-icon {
+        width: 40px;
+        height: 40px;
+        background: #e6f5ec;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .replace-zone .replace-icon svg {
+        width: 20px;
+        height: 20px;
+        color: #019034;
+      }
+      .replace-zone strong {
+        font-size: 13px;
+        color: #1a1a1a;
+      }
+      .replace-zone span {
+        font-size: 11px;
+        color: #888;
+      }
+
+      /* Limit message */
+      .limit-msg {
+        font-size: 11px;
+        color: #888;
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .limit-msg svg {
+        width: 14px;
+        height: 14px;
+        color: #999;
+      }
+
+      /* CTA Button */
+      .btn-use {
+        width: 100%;
+        padding: 14px;
+        background: #019034;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: auto;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+      .btn-use:active {
+        background: #017a2c;
+        transform: scale(0.98);
+      }
+      .btn-use:disabled {
+        background: #9dd6b3;
+        cursor: not-allowed;
+      }
+      .btn-use svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .chat-footer {
+        font-size: 11px;
+        color: #999;
+        text-align: center;
+        padding: 6px 0 8px;
+      }
+
+      /* Status overlay */
+      .status-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.95);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+      .status-overlay.active {
+        display: flex;
+      }
+      .status-overlay .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e0e0e0;
+        border-top-color: #019034;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .status-overlay p {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+      .status-overlay .done-icon {
+        width: 56px;
+        height: 56px;
+        background: #019034;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .status-overlay .done-icon svg {
+        width: 28px;
+        height: 28px;
+        color: #fff;
+      }
+
+      /* Hidden input */
+      .hidden-input {
+        display: none;
+      }
+
+      /* slide animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .slide.active {
+        animation: fadeIn 0.25s ease-out;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════ SLIDE 1: UPLOAD ═══════════════ -->
+    <div id="slide1" class="slide active">
+      <div class="header">
+        <img
+          src="https://renkaat247.fi/bundles/app/img/base/logo.svg"
+          alt="Renkaat247.fi"
+        />
+        <h1>Upload Photos</h1>
+        <p>Add photos to help us provide better<br />tyre recommendations</p>
+      </div>
+      <div class="upload-body">
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+              />
+            </svg>
+          </div>
+          <h3>Drag &amp; drop photos here</h3>
+          <p>or tap to browse from your device</p>
+          <div style="display: flex; gap: 8px; margin-top: 4px">
+            <button class="btn-choose" id="btnChoose" type="button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                />
+              </svg>
+              Gallery
+            </button>
+            <button
+              class="btn-choose"
+              id="btnCamera"
+              type="button"
+              style="background: #1a1a1a"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.822 1.316z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
+                />
+              </svg>
+              Camera
+            </button>
+          </div>
+        </div>
+
+        <div class="trust-badge">
+          <div class="trust-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h4>Your images are secure</h4>
+            <p>Images are only used for this chat and are not stored.</p>
+          </div>
+        </div>
+
+        <div class="benefits">
+          <h4>Why upload photos?</h4>
+          <div class="benefits-grid">
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                  />
+                </svg>
+              </div>
+              <strong>More Accurate</strong>
+              <span>Get precise tyre<br />recommendations</span>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <strong>Saves Time</strong>
+              <span>Skip back and forth<br />questions</span>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
+                  />
+                </svg>
+              </div>
+              <strong>Better Support</strong>
+              <span>We can see what<br />you see</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="footer-text">You can upload up to <b>4 photos</b></p>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SLIDE 2: PREVIEW ═══════════════ -->
+    <div id="slide2" class="slide">
+      <div class="header">
+        <!-- <img src="https://renkaat247.fi/bundles/app/img/base/logo.svg" alt="Renkaat247.fi"> -->
+        <h1>Your Photos</h1>
+        <p>Review your photos or add more</p>
+      </div>
+      <div class="preview-body">
+        <div class="preview-top-row">
+          <span id="uploadCounter">Uploaded (0/4)</span>
+          <button class="clear-all" id="btnClearAll">Clear All</button>
+        </div>
+
+        <div class="photo-grid" id="photoGrid">
+          <!-- Dynamically filled -->
+        </div>
+
+        <div class="dots">
+          <div class="dot" id="dot1"></div>
+          <div class="dot active" id="dot2"></div>
+        </div>
+
+        <div class="replace-zone" id="replaceZone">
+          <div class="replace-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+              />
+            </svg>
+          </div>
+          <strong id="replaceTitle">Replace a photo</strong>
+          <span id="replaceSubtitle">Tap or drag to replace any photo</span>
+        </div>
+
+        <p class="limit-msg" id="limitMsg" style="display: none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+            />
+          </svg>
+          You've reached the maximum limit of <b>&nbsp;4 photos</b>.
+        </p>
+
+        <button class="btn-use" id="btnUse" type="button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4.5 12.75l6 6 9-13.5"
+            />
+          </svg>
+          <span id="btnUseText">Use 0 Photos</span>
+        </button>
+        <p class="chat-footer">These photos will be used in this chat only</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════ STATUS OVERLAY ═══════════════ -->
+    <div class="status-overlay" id="statusOverlay">
+      <div class="spinner" id="statusSpinner"></div>
+      <div class="done-icon" id="statusDone" style="display: none">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.5 12.75l6 6 9-13.5"
+          />
+        </svg>
+      </div>
+      <p id="statusText">Uploading...</p>
+    </div>
+
+    <!-- Hidden file inputs -->
+    <input
+      type="file"
+      id="fileInput"
+      class="hidden-input"
+      accept="image/*"
+      multiple
+    />
+    <input
+      type="file"
+      id="cameraInput"
+      class="hidden-input"
+      accept="image/*"
+      capture="environment"
+    />
+
+    <script type="module" src="capture.js"></script>
+  </body>
+</html>
