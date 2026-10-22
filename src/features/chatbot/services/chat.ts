@@ -1,5 +1,6 @@
 import { ENDPOINTS, chatSocketUrl } from "./apis";
 import { getWidgetKey } from "./config";
+import type { StoreConfig } from "@/lib/config";
 import { apiFetch } from "./http";
 import type {
   Message,
@@ -54,15 +55,41 @@ export interface WidgetSettings {
 }
 
 /** Fetch the store's widget settings; null when they cannot be loaded. */
-export async function fetchWidgetSettings(): Promise<WidgetSettings | null> {
+export type StoreInfoResult = {
+  /** The store the widget key belongs to; null when there is none. */
+  store: StoreConfig | null;
+  /** False when the backend refuses the store (no key, a key for another
+   * site, or a store that is not set up). True on an outage, so the chat
+   * stays usable and sending reports the error instead. */
+  configured: boolean;
+  settings: WidgetSettings | null;
+};
+
+/** The store, its widget settings, and whether the backend accepts it. */
+export async function fetchStoreInfo(): Promise<StoreInfoResult> {
   try {
     const res = await apiFetch(ENDPOINTS.storeInfo);
+    // A rejected key or unknown store is a setup problem, not an outage.
+    if ([400, 401, 403, 404].includes(res.status)) {
+      return { store: null, configured: false, settings: null };
+    }
     const json = await res.json().catch(() => null);
-    if (!res.ok || json?.status !== "success") return null;
-    return { name: json?.data?.name ?? null, ...(json?.data?.widget ?? {}) };
+    const data = json?.data;
+    if (!res.ok || json?.status !== "success" || !data?.code) {
+      return { store: null, configured: true, settings: null };
+    }
+    return {
+      store: {
+        code: data.code,
+        name: data.name ?? "",
+        defaultLang: data.default_language ?? null,
+      },
+      configured: true,
+      settings: { name: data.name ?? null, ...(data.widget ?? {}) },
+    };
   } catch (err) {
-    console.error("Widget settings unavailable:", err);
-    return null;
+    console.error("Store info unavailable:", err);
+    return { store: null, configured: true, settings: null };
   }
 }
 
