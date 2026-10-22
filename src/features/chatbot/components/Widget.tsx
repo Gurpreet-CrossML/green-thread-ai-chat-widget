@@ -44,8 +44,16 @@ function LauncherButton({ onClick }: { onClick: () => void }) {
 }
 
 function Widget() {
-  const { isOpen, setIsOpen, isExpanded, store, storeLoading, widgetSettings } =
-    useChatbotContext();
+  const { t } = useTranslation();
+  const {
+    isOpen,
+    setIsOpen,
+    isExpanded,
+    store,
+    storeLoading,
+    widgetSettings,
+    storeConfigured,
+  } = useChatbotContext();
 
   return (
     <ThemeRoot config={DEFAULT_CHATBOT_CONFIG} settings={widgetSettings}>
@@ -59,25 +67,29 @@ function Widget() {
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {storeLoading && !store ? (
+            {storeLoading ? (
               <div className="rk-loading-container">
                 <div className="rk-spinner"></div>
                 <p className="rk-loading-text">Initializing</p>
               </div>
             ) : !store ? (
               <div className="rk-no-store-container">
-                <p className="rk-no-store-message">
-                  Your store hasn't been registered for chat support yet.
-                </p>
-                <p className="rk-no-store-submessage">
-                  Contact your store administrator or our support team to set up
-                  chatbot support for your store.
-                </p>
+                {storeConfigured === false ? (
+                  <>
+                    <p className="rk-no-store-message">{t("no_store_title")}</p>
+                    <p className="rk-no-store-submessage">
+                      {t("no_store_body")}
+                    </p>
+                  </>
+                ) : (
+                  // The backend could not be reached: an outage, not setup.
+                  <p className="rk-no-store-message">{t("error_occurred")}</p>
+                )}
                 <button
                   className="rk-close-btn"
                   onClick={() => setIsOpen(false)}
                 >
-                  Close
+                  {t("ok")}
                 </button>
               </div>
             ) : (

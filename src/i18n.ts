@@ -34,6 +34,10 @@ i18n
     resources: {
       en: {
         translation: {
+          no_store_title: "Your store isn't configured for chat support yet.",
+          no_store_body:
+            "Please ask your store administrator to configure this store for the chat assistant.",
+          ok: "OK",
           header_title: "Renkaat247",
           support_agent: "Support agent",
           online: "Online",
@@ -71,6 +75,11 @@ i18n
       },
       fi: {
         translation: {
+          no_store_title:
+            "Kauppaasi ei ole vielä määritetty chat-tukea varten.",
+          no_store_body:
+            "Pyydä kaupan ylläpitäjää määrittämään tämä kauppa chat-avustajaa varten.",
+          ok: "OK",
           header_title: "Renkaat247",
           support_agent: "Asiakaspalvelija",
           online: "Paikalla",
@@ -108,6 +117,10 @@ i18n
       },
       et: {
         translation: {
+          no_store_title: "Teie pood ei ole veel vestlustoe jaoks seadistatud.",
+          no_store_body:
+            "Palun paluge poe administraatoril see pood vestlusassistendi jaoks seadistada.",
+          ok: "OK",
           header_title: "Renkaat247",
           support_agent: "Klienditugi",
           online: "Võrgus",
@@ -145,6 +158,10 @@ i18n
       },
       ru: {
         translation: {
+          no_store_title: "Ваш магазин ещё не настроен для чат-поддержки.",
+          no_store_body:
+            "Пожалуйста, попросите администратора магазина настроить этот магазин для чат-ассистента.",
+          ok: "ОК",
           header_title: "Renkaat247",
           support_agent: "Агент поддержки",
           online: "В сети",
