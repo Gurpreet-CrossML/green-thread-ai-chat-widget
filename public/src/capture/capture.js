@@ -1,14 +1,12 @@
 const MAX_PHOTOS = 4;
 
-// The QR link carries the chat thread, a signed upload token and the Store
-// Signal API base; the photos go to that backend's capture endpoint, which
-// relays them to the customer's chat widget.
+// The QR link carries the chat thread, a signed upload token and the
+// backend's API base; the photos go to that backend's capture endpoint, which
+// relays them to the customer's chat widget. There is no fallback backend: a
+// link without them cannot be used.
 const params = new URLSearchParams(location.search);
-const sessionId = params.get("session");
 const uploadToken = params.get("token") || "";
-const apiBase = (
-  params.get("api") || "https://store-signal-api.crossml.in/api"
-).replace(/\/$/, "");
+const apiBase = (params.get("api") || "").replace(/\/$/, "");
 
 // ─── State ───
 let files = []; // Array of { file: File, url: string }
@@ -150,6 +148,15 @@ function clearAll() {
 // ─── Upload (parallel) ───
 async function uploadPhotos() {
   if (files.length === 0) return;
+
+  if (!apiBase || !uploadToken) {
+    statusOvl.classList.add("active");
+    statusSpin.style.display = "none";
+    statusDone.style.display = "none";
+    statusText.textContent =
+      "This upload link is incomplete. Please scan the QR code again.";
+    return;
+  }
 
   statusOvl.classList.add("active");
   statusText.textContent = `Uploading ${files.length} photo${files.length !== 1 ? "s" : ""}...`;

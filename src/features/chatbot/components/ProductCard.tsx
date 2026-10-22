@@ -22,9 +22,7 @@ export function ProductCard({
 
   return (
     <div className="rk-tyre-card">
-      {product.is_premium && (
-        <div className="rk-tyre-premium">⭐ PREMIUM</div>
-      )}
+      {product.is_premium && <div className="rk-tyre-premium">⭐ PREMIUM</div>}
 
       {imageUrl ? (
         <img

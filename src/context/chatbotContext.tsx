@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { Message, Product } from "@/features/chatbot/types";
+import type { Message, Product, SocketFrame } from "@/features/chatbot/types";
 import {
   ALLOWED_FORMATS,
   MAX_FILES,
@@ -108,7 +108,6 @@ export const fetchStoreInfo = (): StoreConfig | null => {
     return null;
   }
 };
-
 
 export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
   const { t, i18n } = useTranslation();
@@ -285,7 +284,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     setCaptureLink("");
   };
 
-  const handleFrame = (data: any) => {
+  const handleFrame = (data: SocketFrame) => {
     if (!data?.success) return;
 
     switch (data.action_type) {
@@ -351,6 +350,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
 
     const final = data.final_update;
     if (!final || typeof final !== "object" || !final.message) return;
+    const text = final.message;
 
     // A human agent writing from the dashboard (live chat).
     if (data.sender === "agent") {
@@ -358,7 +358,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         {
           role: "assistant",
-          text: final.message,
+          text,
           agent_name: final.messaged_by || null,
           created_at: Date.now(),
         },
@@ -381,7 +381,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
       ...prev.filter((m) => m.role !== "streaming"),
       {
         role: "assistant",
-        text: final.message,
+        text,
         products: enrichProductImages(products),
         show_disclaimer,
         answer_language,
@@ -436,7 +436,6 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
           connectSocket(sessionId);
         }
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, store]);
 
   // Close the socket when the widget unmounts.

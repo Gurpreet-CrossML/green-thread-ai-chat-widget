@@ -4,11 +4,7 @@ import { DEFAULT_CHATBOT_CONFIG } from "../constants";
 import { IconClose, IconExpand, IconMinimize } from "./Icons";
 import { StoreConfig } from "@/lib/config";
 
-export function Header({
-  store
-}: {
-  store: StoreConfig | null;
-}) {
+export function Header({ store }: { store: StoreConfig | null }) {
   const { t } = useTranslation();
   const { isExpanded, setIsExpanded, setIsOpen, widgetSettings } =
     useChatbotContext();
@@ -20,14 +16,12 @@ export function Header({
     <header className="rk-header">
       <div className="rk-header-left">
         <div className="rk-logo" aria-hidden>
-          {logo ? (
-            <img src={logo} alt="" />
-          ) : (
-            <span>{name.charAt(0)}</span>
-          )}
+          {logo ? <img src={logo} alt="" /> : <span>{name.charAt(0)}</span>}
         </div>
         <div className="rk-header-title-wrap">
-          <div className="rk-title">{store ? store.name : t("header_title")}</div>
+          <div className="rk-title">
+            {store ? store.name : t("header_title")}
+          </div>
           <div className="rk-status">{t("support_agent")}</div>
         </div>
       </div>

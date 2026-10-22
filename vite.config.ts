@@ -21,14 +21,22 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: [".compute.amazonaws.com", ".compute-1.amazonaws.com", "chatbot.renkaat247.fi"],
+    allowedHosts: [
+      ".compute.amazonaws.com",
+      ".compute-1.amazonaws.com",
+      "chatbot.renkaat247.fi",
+    ],
   },
   // `vite preview` serves the built widget (dist/widget) on port 4173 inside
   // the Docker container — the same deployment method as the old Renkaat app.
   preview: {
     host: true,
     port: 4173,
-    allowedHosts: [".compute.amazonaws.com", ".compute-1.amazonaws.com", "chatbot.renkaat247.fi"],
+    allowedHosts: [
+      ".compute.amazonaws.com",
+      ".compute-1.amazonaws.com",
+      "chatbot.renkaat247.fi",
+    ],
   },
   build: {
     lib: {

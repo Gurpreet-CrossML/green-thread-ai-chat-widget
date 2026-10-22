@@ -59,9 +59,7 @@ export function MessageBubble({
                 />
               )}
 
-              {isLast && generating && (
-                <Loader2 className="rk-stream-loader" />
-              )}
+              {isLast && generating && <Loader2 className="rk-stream-loader" />}
             </>
           )}
         </div>

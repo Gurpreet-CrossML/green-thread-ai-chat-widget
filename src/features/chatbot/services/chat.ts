@@ -1,7 +1,14 @@
 import { ENDPOINTS, chatSocketUrl } from "./apis";
 import { getWidgetKey } from "./config";
 import { apiFetch } from "./http";
-import type { Message, MessageImage, Product } from "../types";
+import type {
+  Message,
+  MessageImage,
+  Product,
+  ReplyJson,
+  ServerMessage,
+  SocketFrame,
+} from "../types";
 
 /**
  * Thrown when the backend refuses to open a thread for this store (unknown
@@ -81,7 +88,7 @@ function toImages(imageUrl: unknown): MessageImage[] {
 }
 
 /** The reply fields the tyre assistant stores in a message's json_content. */
-export function replyFields(jsonContent: any): {
+export function replyFields(jsonContent: ReplyJson | null | undefined): {
   products: Product[];
   show_disclaimer: boolean;
   answer_language: string | null;
@@ -96,7 +103,7 @@ export function replyFields(jsonContent: any): {
 }
 
 /** Map a stored thread message into the widget's Message shape. */
-export function mapHistoryMessage(msg: any): Message {
+export function mapHistoryMessage(msg: ServerMessage): Message {
   const images = toImages(msg?.image_url);
   return {
     role: msg.role === "user" ? "user" : "assistant",
@@ -120,7 +127,7 @@ export async function fetchHistory(threadId: string): Promise<Message[]> {
   }
   const json = await res.json();
   if (json?.data?.is_closed) throw new SessionNotFoundError();
-  const history: any[] = json?.data?.history ?? [];
+  const history: ServerMessage[] = json?.data?.history ?? [];
   return history
     .filter(
       (msg) =>
@@ -178,7 +185,7 @@ export function extractStreamingMessage(raw: string): string | null {
 export type ConnectionStatus = "connecting" | "open" | "closed";
 
 type ChatSocketOptions = {
-  onMessage: (data: any) => void;
+  onMessage: (data: SocketFrame) => void;
   onStatusChange?: (status: ConnectionStatus) => void;
 };
 

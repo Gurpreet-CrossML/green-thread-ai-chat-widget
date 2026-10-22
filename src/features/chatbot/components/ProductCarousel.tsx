@@ -7,7 +7,10 @@ import type { Product } from "../types";
 export function ProductCarousel({ products }: { products: Product[] }) {
   // align "start" → one main card on the left with a peek of the next; snap
   // stepping (no dragFree) → "next" advances exactly one card (1 → 2 → 3 …).
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    loop: false,
+  });
 
   const [prevDisabled, setPrevDisabled] = useState(true);
   const [nextDisabled, setNextDisabled] = useState(true);
@@ -58,8 +61,17 @@ export function ProductCarousel({ products }: { products: Product[] }) {
             aria-label="Previous"
             type="button"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
-              <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+            >
+              <path
+                d="m15 18-6-6 6-6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <button
@@ -69,8 +81,17 @@ export function ProductCarousel({ products }: { products: Product[] }) {
             aria-label="Next"
             type="button"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
-              <path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+            >
+              <path
+                d="m9 18 6-6-6-6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>

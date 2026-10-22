@@ -12,8 +12,9 @@
  * bearer token: the widget never decodes it.
  */
 
-const DEFAULT_API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "https://store-signal-api.crossml.in/api";
+// No hard-coded fallback: this is the client's own deployment, so the API
+// base must come from the embed, window.CHATBOT_CONFIG or VITE_API_BASE_URL.
+const DEFAULT_API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 
 // For local development (`npm run dev`): the widget key from
 // `.env.development`, used only when the page has no `data-widget-key` and no
@@ -41,7 +42,7 @@ function deriveWsBase(apiBase: string): string {
     const proto = u.protocol === "https:" ? "wss:" : "ws:";
     return `${proto}//${u.host}/ws/chat/`;
   } catch {
-    return "wss://store-signal-api.crossml.in/ws/chat/";
+    return "";
   }
 }
 
@@ -65,6 +66,12 @@ function resolve(): RuntimeConfig {
     readScriptAttr("data-api-base") ||
     DEFAULT_API_BASE
   ).replace(/\/$/, "");
+  if (!apiBase) {
+    console.error(
+      "Chatbot widget: no API base configured. Set data-api-base on the " +
+        "script tag, window.CHATBOT_CONFIG.apiBase, or VITE_API_BASE_URL.",
+    );
+  }
   return { widgetKey, apiBase, wsBase: deriveWsBase(apiBase) };
 }
 

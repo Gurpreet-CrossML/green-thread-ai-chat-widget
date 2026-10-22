@@ -18,7 +18,11 @@
     0 20px 60px -20px rgba(1, 80, 40, 0.28),
     0 8px 24px -12px rgba(1, 80, 40, 0.18);
 
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   color: var(--rk-fg);
   font-size: 14px;
   line-height: 1.5;
@@ -385,7 +389,6 @@
 .rk-close-btn:active {
   transform: translateY(0);
 }
-
 
 /* Markdown inside assistant bubbles */
 .rk-bubble p {

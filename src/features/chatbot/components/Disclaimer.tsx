@@ -22,13 +22,17 @@ export function Disclaimer({
   return (
     <div className="rk-disclaimer">
       <p className="rk-disclaimer-text">
-        <span className="rk-disclaimer-title">{t("disclaimer_title", { lng })}</span>
+        <span className="rk-disclaimer-title">
+          {t("disclaimer_title", { lng })}
+        </span>
         {t("disclaimer_text", { lng })}
       </p>
       {captureLink && (
         <div className="rk-disclaimer-qr">
           <img src={qrSrc} alt="QR Code" />
-          <span className="rk-disclaimer-qr-label">{t("upload_via_qr", { lng })}</span>
+          <span className="rk-disclaimer-qr-label">
+            {t("upload_via_qr", { lng })}
+          </span>
         </div>
       )}
     </div>

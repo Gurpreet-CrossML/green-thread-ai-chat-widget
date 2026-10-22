@@ -57,3 +57,38 @@ export interface ChatbotConfig {
   font_family: string;
   border_radius: string;
 }
+
+/** The structured part of an assistant reply (a message's json_content). */
+export interface ReplyJson {
+  recommendations?: Product[];
+  show_disclaimer?: boolean;
+  answer_language?: string | null;
+}
+
+/** A stored thread message, as the history endpoint returns it. */
+export interface ServerMessage {
+  role: string;
+  message?: string;
+  message_type?: string;
+  image_url?: unknown;
+  created_at: string;
+  messaged_by?: string | null;
+  json_content?: ReplyJson | null;
+}
+
+/** A frame the chat socket sends (see the backend's chat.consumers). */
+export interface SocketFrame {
+  success?: boolean;
+  action_type?: string;
+  chat_handler?: string;
+  image_url?: string;
+  tool_text?: string;
+  sender?: string;
+  chunk?: string;
+  final_update?: {
+    message?: string;
+    messaged_by?: string | null;
+    json_content?: ReplyJson | null;
+    is_active?: boolean | string;
+  } | null;
+}

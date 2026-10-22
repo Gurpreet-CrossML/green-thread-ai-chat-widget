@@ -74,12 +74,12 @@ Embed on any page:
 <script
   src="https://chatbot.renkaat247.fi/chatbot.cjs.js"
   data-widget-key="<the store's widget key from the Store Signal dashboard>"
-  data-api-base="https://store-signal-api.crossml.in/api"
+  data-api-base="https://<your-backend-host>/api"
 ></script>
 ```
 
-`data-widget-key` is required; `data-api-base` defaults to the production
-Store Signal API (or `VITE_API_BASE_URL` at build time). Both can also be set as
+`data-widget-key` is required. `data-api-base` is required too unless the
+build set `VITE_API_BASE_URL`; there is no built-in default backend. Both can also be set as
 `window.CHATBOT_CONFIG = { widgetKey, apiBase }` before the script loads.
 
 Or auto-initialise (and optionally set language):

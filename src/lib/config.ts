@@ -11,8 +11,8 @@ import type { Lang } from "@/i18n";
 // Set with VITE_CAPTURE_URL (e.g. in .env.development, a URL your phone can
 // reach on the local network); defaults to the deployed page.
 export const CAPTURE_URL =
-  import.meta.env.VITE_CAPTURE_URL || "https://chatbot.renkaat247.fi/src/capture/";
-
+  import.meta.env.VITE_CAPTURE_URL ||
+  "https://chatbot.renkaat247.fi/src/capture/";
 
 // Store configuration for the tyre-selection assistant.
 export type StoreConfig = {
@@ -27,25 +27,25 @@ export type StoreConfig = {
   name: string;
   logo: string;
   code: string;
-}
+};
 
 // Enabled stores for the tyre-selection assistant.
 export const ENABLED_STORES: Record<string, StoreConfig> = {
-  "renkaat247": {
+  renkaat247: {
     defaultLang: "fi",
     urls: ["https://renkaat247.fi/", "http://renkaat.staging.rehvid.we.ee/"],
     name: "Renkaat247",
     logo: "https://renkaat247.fi/wp-content/uploads/2022/09/logo.svg",
     code: "renkaat247",
   },
-  "rehvid": {
+  rehvid: {
     defaultLang: "et",
     urls: ["https://rehvid.com/", "https://rehvid.we.ee/"],
     name: "Rehvid",
     logo: "https://rehvid.com/bundles/app/img/base/rehvid/logo.svg",
     code: "rehvid",
-  }
-}
+  },
+};
 
 // Look up a store directly by its code. Used only by the localhost development
 // override (see `fetchStoreInfo`); production resolves the store from the page
@@ -59,7 +59,10 @@ export const getStoreByCode = (code: string): StoreConfig | null => {
 // ("renkaat247.fi." -> "renkaat247.fi"), and strip a single leading "www."
 // label. Any other subdomain labels are preserved on purpose.
 const normalizeHost = (host: string): string =>
-  host.toLowerCase().replace(/\.$/, "").replace(/^www\./, "");
+  host
+    .toLowerCase()
+    .replace(/\.$/, "")
+    .replace(/^www\./, "");
 
 // Extract the registrable hostname from either a full URL/origin (what
 // `window.location.origin` gives us) or a bare host string like
