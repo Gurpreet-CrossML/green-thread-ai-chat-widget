@@ -21,7 +21,7 @@ import {
   extractStreamingMessage,
   fetchCaptureToken,
   fetchHistory,
-  fetchWidgetSettings,
+  fetchStoreInfo,
   replyFields,
   SessionNotFoundError,
   StoreUnavailableError,
@@ -29,12 +29,7 @@ import {
   type WidgetSettings,
 } from "@/features/chatbot/services/chat";
 import { base64ToFile, convertFileToBase64 } from "@/lib/utils";
-import {
-  CAPTURE_URL,
-  getStoreByCode,
-  getStoreConfig,
-  StoreConfig,
-} from "@/lib/config";
+import { CAPTURE_URL, type StoreConfig } from "@/lib/config";
 import { FALLBACK_LANG, isSupportedLang, type Lang } from "@/i18n";
 
 interface ChatbotContextValue {
@@ -63,6 +58,8 @@ interface ChatbotContextValue {
   captureLink: string;
   /** The store's look from the dashboard's Widget Customisation, once loaded. */
   widgetSettings: WidgetSettings | null;
+  /** Whether the backend accepts this store; null until it has answered. */
+  storeConfigured: boolean | null;
 
   sendMessage: (text: string) => Promise<void>;
 }
@@ -74,39 +71,6 @@ export const useChatbotContext = () => {
   if (!ctx)
     throw new Error("useChatbotContext must be used inside <ChatbotProvider>");
   return ctx;
-};
-
-// Resolve the store the widget is running on.
-//
-// Production: from the page's origin (hostname) via `getStoreConfig`.
-// Development: on a localhost origin — where the hostname matches no real store —
-// a store may be selected with the `VITE_STORE_CODE` env var so the widget can be
-// tested as any store. The override is gated on a localhost origin, so it can
-// never take effect on a deployed store even if the build baked in a value.
-export const fetchStoreInfo = (): StoreConfig | null => {
-  try {
-    const origin = window.location.origin;
-    const host = new URL(origin).hostname;
-    const isLocalhost =
-      host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0";
-
-    if (isLocalhost) {
-      const envStoreCode = import.meta.env.VITE_STORE_CODE?.trim();
-      if (envStoreCode) {
-        const config = getStoreByCode(envStoreCode);
-        if (config) return config;
-        console.warn(
-          `VITE_STORE_CODE="${envStoreCode}" is not a known store; ` +
-            "falling back to hostname resolution.",
-        );
-      }
-    }
-
-    return getStoreConfig(origin);
-  } catch (err) {
-    console.error("Store fetching error:", err);
-    return null;
-  }
 };
 
 export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
@@ -129,6 +93,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
   const [widgetSettings, setWidgetSettings] = useState<WidgetSettings | null>(
     null,
   );
+  const [storeConfigured, setStoreConfigured] = useState<boolean | null>(null);
 
   const storeRef = useRef<StoreConfig | null>(null);
   // Helper to update store state and ref
@@ -137,19 +102,21 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     storeRef.current = data;
   };
 
-  //
+  // ── The store, its look (colours, logo, greeting) and whether the backend
+  // accepts it, all from /store/info/ — the widget key identifies the store. ──
   useEffect(() => {
-    if (!store) {
-      try {
-        const storeConfig = fetchStoreInfo();
-        updateStore(storeConfig);
-        setStoreLoading(false);
-      } catch (error) {
-        console.error("Error fetching store info:", error);
-        setStoreLoading(false);
-      }
-    }
-  }, [store]);
+    let cancelled = false;
+    fetchStoreInfo().then(({ store: info, configured, settings }) => {
+      if (cancelled) return;
+      updateStore(info);
+      setStoreConfigured(configured);
+      setWidgetSettings(settings);
+      setStoreLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // The thread's chat socket (Store Signal's `/ws/chat/<thread>/`), the
   // thread id it is open for, and the in-flight thread creation.
@@ -226,18 +193,6 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     const target = getTargetLang();
     if (i18n.language !== target) i18n.changeLanguage(target);
   }, [i18n, store]);
-
-  // ── The store's look (colours, logo, greeting) from the dashboard. ──
-  useEffect(() => {
-    if (!store) return;
-    let cancelled = false;
-    fetchWidgetSettings().then((settings) => {
-      if (!cancelled) setWidgetSettings(settings);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [store]);
 
   // ── Keep the initial greeting in sync with the active language, or the
   // store's own greeting when one is set in the dashboard. ──
@@ -579,6 +534,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     setShowQR,
     captureLink,
     widgetSettings,
+    storeConfigured,
     sendMessage,
   };
 
