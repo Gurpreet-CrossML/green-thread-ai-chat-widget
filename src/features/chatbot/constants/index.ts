@@ -19,3 +19,7 @@ export const MAX_FILES = 4;
 export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 export const ALLOWED_FORMATS = ["jpg", "jpeg", "png"];
 export const ACCEPT_MIME = "image/png, image/jpeg";
+
+// After the backend closes a thread, how long the old chat stays on screen
+// (long enough to read a closing message) before a fresh chat replaces it.
+export const FRESH_CHAT_DELAY_MS = 5000;
