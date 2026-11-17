@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import type { Message, Product, SocketFrame } from "@/features/chatbot/types";
 import {
   ALLOWED_FORMATS,
+  FRESH_CHAT_DELAY_MS,
   MAX_FILES,
   MAX_FILE_SIZE,
 } from "@/features/chatbot/constants";
@@ -241,10 +242,40 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     setCaptureLink("");
   };
 
+  // The backend ended the thread (inactivity, an agent, or deleted). Forget it
+  // now, so a new message opens a new thread, then after a short pause (time
+  // to read a closing follow-up) replace the old chat with a fresh greeting.
+  const freshChatTimerRef = useRef<number | undefined>(undefined);
+  const endThread = () => {
+    sessionIdRef.current = "";
+    localStorage.removeItem("sessionId");
+    setSessionId("");
+    setCaptureLink("");
+    const greeting = widgetSettings?.greeting_message?.trim() || t("greeting");
+    window.clearTimeout(freshChatTimerRef.current);
+    freshChatTimerRef.current = window.setTimeout(() => {
+      // The customer already started a new chat in the meantime: keep it.
+      if (sessionIdRef.current) return;
+      socketRef.current?.close();
+      socketRef.current = null;
+      resetStream();
+      setLoading(false);
+      setGenerating(false);
+      setToolText("");
+      setMessages([
+        { role: "assistant", text: greeting, created_at: Date.now() },
+      ]);
+    }, FRESH_CHAT_DELAY_MS);
+  };
+
   const handleFrame = (data: SocketFrame) => {
     if (!data?.success) return;
 
     switch (data.action_type) {
+      case "thread_close":
+        endThread();
+        return;
+
       case "connection":
       case "handler_change":
         agentConnectedRef.current = data.chat_handler === "human";
@@ -354,7 +385,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     ]);
 
     if (final.is_active === false || final.is_active === "false") {
-      dropSession();
+      endThread();
     }
   };
 
@@ -403,7 +434,13 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
   }, [sessionId, store]);
 
   // Close the socket when the widget unmounts.
-  useEffect(() => () => socketRef.current?.close(), []);
+  useEffect(
+    () => () => {
+      socketRef.current?.close();
+      window.clearTimeout(freshChatTimerRef.current);
+    },
+    [],
+  );
 
   // ── The thread id, opening a new thread (and its socket) when there is none. ──
   const ensureSession = async (): Promise<string> => {
