@@ -3,6 +3,7 @@ import { getWidgetKey } from "./config";
 import type { StoreConfig } from "@/lib/config";
 import { apiFetch } from "./http";
 import type {
+  HandlerEvent,
   Message,
   MessageImage,
   Product,
@@ -143,6 +144,40 @@ export function mapHistoryMessage(msg: ServerMessage): Message {
   };
 }
 
+/** An agent joined / left event as a notice row in the message list. */
+export function noticeMessage(event: HandlerEvent): Message {
+  return {
+    role: "assistant",
+    text: "",
+    created_at: Date.parse(event.created_at ?? "") || Date.now(),
+    notice: event,
+  };
+}
+
+const noticeId = (m: Message) =>
+  m.notice?.id == null ? null : String(m.notice.id);
+
+/**
+ * `prev` followed by `next`, skipping notices whose event id is already
+ * shown, so an event from both the live frame and the history appears once.
+ */
+export function appendMessages(prev: Message[], next: Message[]): Message[] {
+  const seen = new Set(prev.map(noticeId));
+  return [
+    ...prev,
+    ...next.filter((m) => {
+      const id = noticeId(m);
+      if (id === null) return true;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    }),
+  ];
+}
+
+/** A history item: a message, or an agent joined / left marker. */
+type HistoryItem = ServerMessage | (HandlerEvent & { type: "handler_event" });
+
 /** Fetch the thread's prior conversation. */
 export async function fetchHistory(threadId: string): Promise<Message[]> {
   const res = await apiFetch(ENDPOINTS.threadMessages(threadId));
@@ -154,15 +189,17 @@ export async function fetchHistory(threadId: string): Promise<Message[]> {
   }
   const json = await res.json();
   if (json?.data?.is_closed) throw new SessionNotFoundError();
-  const history: ServerMessage[] = json?.data?.history ?? [];
-  return history
-    .filter(
-      (msg) =>
-        (msg?.role === "user" || msg?.role === "assistant") &&
-        msg?.message_type !== "internal" &&
-        msg?.message_type !== "ai_action",
-    )
-    .map(mapHistoryMessage);
+  // One chronological list; agent markers become notice rows in place.
+  const history: HistoryItem[] = json?.data?.history ?? [];
+  return history.flatMap((item) => {
+    if (!item) return [];
+    if (item.type === "handler_event") return [noticeMessage(item)];
+    const shown =
+      (item.role === "user" || item.role === "assistant") &&
+      item.message_type !== "internal" &&
+      item.message_type !== "ai_action";
+    return shown ? [mapHistoryMessage(item)] : [];
+  });
 }
 
 /** Upload the attached photos for a thread; returns their public URLs. */
