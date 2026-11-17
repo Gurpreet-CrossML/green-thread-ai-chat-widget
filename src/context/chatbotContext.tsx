@@ -16,12 +16,14 @@ import {
 } from "@/features/chatbot/constants";
 import { captureApiBase } from "@/features/chatbot/services/apis";
 import {
+  appendMessages,
   ChatSocket,
   createThread,
   extractStreamingMessage,
   fetchCaptureToken,
   fetchHistory,
   fetchStoreInfo,
+  noticeMessage,
   replyFields,
   SessionNotFoundError,
   StoreUnavailableError,
@@ -250,6 +252,13 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
           setLoading(false);
           setToolText("");
         }
+        // Who joined / left: one notice row per event, in time order.
+        if (data.action_type === "handler_change" && data.events?.length) {
+          const notices = data.events
+            .map(noticeMessage)
+            .sort((a, b) => a.created_at - b.created_at);
+          setMessages((prev) => appendMessages(prev, notices));
+        }
         return;
 
       case "photo_uploaded":
@@ -382,7 +391,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
           ...m,
           products: enrichProductImages(m.products),
         }));
-        setMessages((prev) => [...prev, ...enriched]);
+        setMessages((prev) => appendMessages(prev, enriched));
       })
       .catch((err) => {
         if (err instanceof SessionNotFoundError) {
