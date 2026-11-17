@@ -2,13 +2,34 @@ import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useTranslation } from "react-i18next";
 import { useChatbotContext } from "@/context/chatbotContext";
+import type { HandlerEvent } from "../types";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 
 export function MessagesTab() {
-  const { messages, loading, generating, toolText, isOpen } =
+  const { t } = useTranslation();
+  const { messages, loading, generating, toolText, isOpen, store } =
     useChatbotContext();
+
+  // "<agent> from <store> has joined / left the chat."; a hand-back to the AI
+  // ("release") adds that the AI took over (not on agent-to-agent handovers).
+  const noticeText = (notice: HandlerEvent) => {
+    // Display name only: the backend sends the email when the agent has no
+    // name, and the customer must never see it.
+    const name = notice.agent_name?.trim();
+    const agent = name && !name.includes("@") ? name : t("an_agent");
+    const storeName = store?.name.trim();
+    const key = notice.event === "left" ? "agent_left" : "agent_joined";
+    const text = t(storeName ? `${key}_store` : key, {
+      agent,
+      store: storeName,
+    });
+    return notice.event === "left" && notice.action === "release"
+      ? `${text} ${t("ai_took_over")}`
+      : text;
+  };
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
@@ -59,13 +80,19 @@ export function MessagesTab() {
     <>
       <div className="rk-content" ref={containerRef}>
         <div className="rk-messages">
-          {messages.map((message, index) => (
-            <MessageBubble
-              key={index}
-              message={message}
-              isLast={index === messages.length - 1}
-            />
-          ))}
+          {messages.map((message, index) =>
+            message.notice ? (
+              <div key={index} className="rk-notice">
+                <span>{noticeText(message.notice)}</span>
+              </div>
+            ) : (
+              <MessageBubble
+                key={index}
+                message={message}
+                isLast={index === messages.length - 1}
+              />
+            ),
+          )}
 
           {/* Tool / progress status */}
           {loading && toolText !== "" && (

@@ -45,6 +45,21 @@ export interface Message {
   answer_language?: string | null;
   /** Set when a human agent wrote this reply from the dashboard (live chat). */
   agent_name?: string | null;
+  /** Set on an "agent joined / left" notice row (live chat); text is empty. */
+  notice?: HandlerEvent;
+}
+
+/** An agent joining or leaving a live chat (`handler_change` frame, history). */
+export interface HandlerEvent {
+  type?: "handler_event";
+  /** `<assignment id>-<event>`, the same live and in history. */
+  id?: string | number;
+  event: "joined" | "left";
+  /** takeover / reassign / release / closed; "release" hands back to the AI. */
+  action?: string;
+  /** The agent's display name. */
+  agent_name?: string | null;
+  created_at?: string;
 }
 
 /** Static, brand-level config for the widget (single-tenant Renkaat). */
@@ -67,6 +82,7 @@ export interface ReplyJson {
 
 /** A stored thread message, as the history endpoint returns it. */
 export interface ServerMessage {
+  type?: "message";
   role: string;
   message?: string;
   message_type?: string;
@@ -81,6 +97,8 @@ export interface SocketFrame {
   success?: boolean;
   action_type?: string;
   chat_handler?: string;
+  /** `handler_change`: who joined / left, oldest first. */
+  events?: HandlerEvent[] | null;
   image_url?: string;
   tool_text?: string;
   sender?: string;

@@ -313,6 +313,31 @@
   padding: 0 4px;
 }
 
+/* ── Agent joined / left notice: muted text between two thin lines ── */
+.rk-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--rk-fg-muted);
+  text-align: center;
+}
+.rk-notice::before,
+.rk-notice::after {
+  content: "";
+  flex: 1 1 0;
+  min-width: 16px;
+  height: 1px;
+  background: var(--rk-border);
+}
+.rk-notice span {
+  min-width: 0;
+  max-width: 80%;
+  overflow-wrap: anywhere;
+}
+
 /* Loading State */
 .rk-loading-container {
   display: flex;
