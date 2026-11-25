@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CircleX, MonitorSmartphone, Paperclip, Send } from "lucide-react";
+import {
+  CircleX,
+  Loader2,
+  MonitorSmartphone,
+  Paperclip,
+  Send,
+} from "lucide-react";
 import { useChatbotContext } from "@/context/chatbotContext";
-import { ACCEPT_MIME } from "../constants";
+import { ACCEPT_MIME, MAX_FILES } from "../constants";
 
 export function MessageInput() {
   const { t } = useTranslation();
@@ -11,6 +17,7 @@ export function MessageInput() {
     loading,
     generating,
     files,
+    downloadingPhotos,
     addFiles,
     removeFile,
     setShowQR,
@@ -20,6 +27,13 @@ export function MessageInput() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const disabled = loading || generating;
+  // One loading tile per phone photo still on its way, within the image cap.
+  const loadingTiles = Math.min(
+    downloadingPhotos,
+    Math.max(0, MAX_FILES - files.length),
+  );
+  // Send waits for them, so a photo can't miss the message it was taken for.
+  const sendBlocked = disabled || downloadingPhotos > 0;
 
   // Auto-grow the textarea.
   useEffect(() => {
@@ -30,7 +44,7 @@ export function MessageInput() {
   }, [text]);
 
   const handleSend = () => {
-    if (disabled) return;
+    if (sendBlocked) return;
     if (!text.trim() && files.length === 0) return;
     sendMessage(text);
     setText("");
@@ -44,7 +58,7 @@ export function MessageInput() {
   return (
     <div className="rk-input-wrap">
       <div className="rk-input-box">
-        {files.length > 0 && (
+        {files.length + loadingTiles > 0 && (
           <div className="rk-input-previews">
             {files.map((file, index) => (
               <div className="rk-input-preview" key={index}>
@@ -56,6 +70,17 @@ export function MessageInput() {
                 >
                   <CircleX size={16} />
                 </button>
+              </div>
+            ))}
+            {Array.from({ length: loadingTiles }, (_, index) => (
+              <div
+                className="rk-input-preview rk-input-preview-loading"
+                key={`loading-${index}`}
+                role="status"
+                aria-label={t("downloading_image")}
+                title={t("downloading_image")}
+              >
+                <Loader2 size={20} />
               </div>
             ))}
           </div>
@@ -107,7 +132,7 @@ export function MessageInput() {
           <button
             className="rk-input-btn send"
             onClick={handleSend}
-            disabled={disabled || (!text.trim() && files.length === 0)}
+            disabled={sendBlocked || (!text.trim() && files.length === 0)}
             aria-label="Send message"
             type="button"
           >
