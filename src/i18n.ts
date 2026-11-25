@@ -55,6 +55,7 @@ i18n
           disclaimer_text:
             "For better accuracy in tyre recommendations, please upload image of the vehicle side and of current tires by uploading images or by using the QR code below. You can also load images from your folder by clicking the paper clip symbol. If your vehicle has different tire size in front and rear axle, please take pictures from both axles.",
           upload_via_qr: "UPLOAD IMAGE VIA QR",
+          downloading_image: "Downloading image…",
           scan_to_upload: "Scan to Upload",
           scan_to_upload_desc:
             "Scan this QR code with your phone camera to upload images directly.",
@@ -103,6 +104,7 @@ i18n
           disclaimer_text:
             "Tarkempien suositusten antamiseksi, lataa kuva autosi sivuprofiilista ja renkaasta. Voit käyttää alla olevaa QR-koodia tai voit ladata kuvat tiedostoistasi käyttämällä paperiliitin-kuvaketta. Jos autossa on eri rengaskoko etu- ja taka-akselilla, ota kuvat kummankin akselin renkaasta.",
           upload_via_qr: "LATAA KUVA QR-KOODILLA",
+          downloading_image: "Ladataan kuvaa…",
           scan_to_upload: "Skannaa ladataksesi",
           scan_to_upload_desc:
             "Skannaa tämä QR-koodi puhelimesi kameralla ladataksesi kuvat suoraan.",
@@ -150,6 +152,7 @@ i18n
           disclaimer_text:
             "Rehvisoovituste täpsuse parandamiseks laadige palun üles pilt sõiduki küljest ja praegustest rehvidest, kasutades allolevat QR-koodi. Pilte saate lisada ka oma kaustast, klõpsates kirjaklambri ikoonil. Kui teie sõidukil on esi- ja tagateljel erineva suurusega rehvid, tehke palun pildid mõlemast teljest.",
           upload_via_qr: "LAADI PILT ÜLES QR-KOODIGA",
+          downloading_image: "Pilti laaditakse…",
           scan_to_upload: "Skanni üleslaadimiseks",
           scan_to_upload_desc:
             "Skannige see QR-kood oma telefoni kaameraga, et pilte otse üles laadida.",
@@ -197,6 +200,7 @@ i18n
           disclaimer_text:
             "Для повышения точности рекомендаций по шинам, пожалуйста, загрузите фотографию автомобиля сбоку и текущих шин с помощью QR-кода ниже. Вы также можете загрузить изображения из своей папки, нажав на значок скрепки. Если на передней и задней осях вашего автомобиля установлены шины разного размера, сделайте, пожалуйста, фотографии обеих осей.",
           upload_via_qr: "ЗАГРУЗИТЬ ФОТО ПО QR-КОДУ",
+          downloading_image: "Загрузка изображения…",
           scan_to_upload: "Сканируйте для загрузки",
           scan_to_upload_desc:
             "Отсканируйте этот QR-код камерой телефона, чтобы загрузить изображения напрямую.",

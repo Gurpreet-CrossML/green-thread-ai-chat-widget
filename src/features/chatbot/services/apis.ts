@@ -11,6 +11,8 @@ export const ENDPOINTS = {
   uploadImages: `${BASE_URL}/support/attachments/upload/`,
   captureToken: (threadId: string) =>
     `${BASE_URL}/chat/threads/${threadId}/capture-token/`,
+  capturePhoto: (threadId: string, photoId: string) =>
+    `${BASE_URL}/chat/threads/${threadId}/capture-photos/${photoId}/`,
 };
 
 /** The thread's chat socket (the same socket as the Store Signal widget). */

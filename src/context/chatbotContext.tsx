@@ -21,6 +21,7 @@ import {
   ChatSocket,
   createThread,
   extractStreamingMessage,
+  fetchCapturePhoto,
   fetchCaptureToken,
   fetchHistory,
   fetchStoreInfo,
@@ -31,7 +32,7 @@ import {
   uploadImages,
   type WidgetSettings,
 } from "@/features/chatbot/services/chat";
-import { base64ToFile, convertFileToBase64 } from "@/lib/utils";
+import { convertFileToBase64 } from "@/lib/utils";
 import { CAPTURE_URL, type StoreConfig } from "@/lib/config";
 import { FALLBACK_LANG, isSupportedLang, type Lang } from "@/i18n";
 
@@ -51,6 +52,8 @@ interface ChatbotContextValue {
   store: StoreConfig | null;
 
   files: File[];
+  /** QR capture photos still downloading; shown as loading tiles. */
+  downloadingPhotos: number;
   addFiles: (files: FileList | File[]) => void;
   removeFile: (index: number) => void;
   clearFiles: () => void;
@@ -91,6 +94,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
   const [generating, setGenerating] = useState(false);
   const [toolText, setToolText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [downloadingPhotos, setDownloadingPhotos] = useState(0);
   const [showQR, setShowQR] = useState(false);
   const [captureLink, setCaptureLink] = useState("");
   const [widgetSettings, setWidgetSettings] = useState<WidgetSettings | null>(
@@ -293,10 +297,18 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
         return;
 
       case "photo_uploaded":
-        // A photo taken on the QR capture page: becomes a pending attachment.
-        if (data.image_url) {
-          const file = base64ToFile(data.image_url, `camera_${Date.now()}.jpg`);
-          setFiles((prev) => [...prev, file].slice(0, MAX_FILES));
+        // A photo taken on the QR capture page: downloaded by id, then a
+        // pending attachment like one picked with the paper clip.
+        if (data.photo_id && sessionIdRef.current) {
+          setDownloadingPhotos((count) => count + 1);
+          fetchCapturePhoto(sessionIdRef.current, data.photo_id)
+            .then((file) =>
+              setFiles((prev) => [...prev, file].slice(0, MAX_FILES)),
+            )
+            .catch((err) => console.error("QR photo download failed:", err))
+            .finally(() =>
+              setDownloadingPhotos((count) => Math.max(0, count - 1)),
+            );
         }
         return;
 
@@ -573,6 +585,7 @@ export const ChatbotProvider = ({ children }: { children: ReactNode }) => {
     generating,
     toolText,
     files,
+    downloadingPhotos,
     addFiles,
     removeFile,
     clearFiles,
