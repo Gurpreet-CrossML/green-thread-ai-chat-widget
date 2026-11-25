@@ -37,14 +37,3 @@ export function convertFileToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
-
-/** Convert a base64 data-URL back into a File (used for QR-uploaded photos). */
-export function base64ToFile(base64: string, filename = "photo.jpg"): File {
-  const arr = base64.split(",");
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) u8arr[n] = bstr.charCodeAt(n);
-  return new File([u8arr], filename, { type: mime });
-}

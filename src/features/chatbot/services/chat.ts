@@ -234,6 +234,21 @@ export async function fetchCaptureToken(threadId: string): Promise<string> {
 }
 
 /**
+ * A photo sent from the QR capture page. The socket frame names it by id; the
+ * photo itself is downloaded here, as it is too big for a socket message.
+ */
+export async function fetchCapturePhoto(
+  threadId: string,
+  photoId: string,
+): Promise<File> {
+  const res = await apiFetch(ENDPOINTS.capturePhoto(threadId, photoId));
+  if (!res.ok) throw new Error("Captured photo unavailable.");
+  const blob = await res.blob();
+  const ext = blob.type === "image/png" ? "png" : "jpg";
+  return new File([blob], `camera_${Date.now()}.${ext}`, { type: blob.type });
+}
+
+/**
  * Extract the `"message"` value from a reply's partial JSON as it streams in.
  * Returns null until the key has arrived.
  */

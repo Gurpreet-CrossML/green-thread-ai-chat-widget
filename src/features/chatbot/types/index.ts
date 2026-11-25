@@ -99,7 +99,8 @@ export interface SocketFrame {
   chat_handler?: string;
   /** `handler_change`: who joined / left, oldest first. */
   events?: HandlerEvent[] | null;
-  image_url?: string;
+  /** `photo_uploaded`: the QR capture photo to download. */
+  photo_id?: string;
   tool_text?: string;
   sender?: string;
   chunk?: string;
